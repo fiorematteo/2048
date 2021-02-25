@@ -14,6 +14,7 @@ def game_over():
                 return 1
             x += 1
         y += 1
+
     y = 0
     while y <= 3:
         x = 0
@@ -22,6 +23,22 @@ def game_over():
                 return 0
             x += 1
         y += 1
+
+    y = 0
+    while y <= 3:
+        x = 0
+        while x <= 3:
+            if y + 1 <= 3 and table[y][x] == table[y+1][x]:
+                return 0
+            if x + 1 <= 3 and table[y][x] == table[y][x+1]:
+                return 0
+            if x - 1 >= 0 and table[y][x] == table[y-1][x]:
+                return 0
+            if x - 1 >= 0 and table[y][x] == table[y][x-1]:
+                return 0
+            x += 1
+        y += 1
+
     return -1
 
 
@@ -131,8 +148,16 @@ def move(dir):
         move_horizontal(-1)
     print(score)
 
+
 def color_selector(val):
-    colors = [(239,217,206),(222,192,241),(183,156,237),(149,127,239),(113,97,239),(47,102,144),(22,48,91),(71,106,111)]
+    colors = [(239, 217, 206),
+              (222, 192, 241),
+              (183, 156, 237),
+              (149, 127,239),
+              (113, 97, 239),
+              (47, 102, 144),
+              (22, 48, 91),
+              (71, 106, 111)]
     return colors[int(math.log(val, 2)) % len(colors)]
 
 
@@ -163,7 +188,7 @@ while run == 0:
     dir = ""  # UP DOWN LEFT RIGHT
     for event in pg.event.get():
         if event.type == pg.QUIT:
-            run = False
+            run = -1
         elif event.type == pg.KEYDOWN:
             if event.key == pg.K_w:
                 dir = "UP"
@@ -200,11 +225,14 @@ while run == 0:
         x = 0
         while x < 4:
             unit = pg.Rect((padding+(x*side), padding+(y*side), side, side))
-            pg.draw.rect(win,(50,0,150) if table[y][x] == 0 else color_selector(table[y][x]), unit, width=0)
+            pg.draw.rect(win, (50, 0, 150) if table[y][x] == 0 else color_selector(
+                table[y][x]), unit, width=0)
             pg.draw.rect(win, RED, unit, width=1)
-            text = pg.Rect(unit)
-            win.blit(font.render(
-                str(table[y][x] if not table[y][x] == 0 else ""), True, RED), text.center)
+            text_surface = font.render(
+                str(table[y][x] if not table[y][x] == 0 else ""), True, RED)
+            text_rect = text_surface.get_rect()
+            text_rect.center = unit.center
+            win.blit(text_surface, text_rect)
             x += 1
         y += 1
 
