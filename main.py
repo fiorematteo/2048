@@ -1,11 +1,10 @@
 import Game
 import PygameController
-import time
 import pudb
 
 
 def recursive(fakeGame, direction, score, free_coord, depth):
-    if depth < 5:
+    if depth < 7:
         scores = []
         if not free_coord[0] == None:
             fakeGame.table[free_coord[0]][free_coord[1]] = 2
@@ -25,19 +24,22 @@ def recursive(fakeGame, direction, score, free_coord, depth):
                 tmpTable = [row[:] for row in fakeGame.table]
                 fakeGame = Game.Game()
                 fakeGame.table = tmpTable
-                scores.append(recursive(fakeGame, direction, score, free_coord, depth+1))
-            return max(scores)
-    return score
+                scores.append(recursive(fakeGame, direction, score, free_coord, depth+1)[0])
+            return max(scores), free_coord
+    return score, free_coord
 
 def AI():
-    scores = []
+    output = []
     directions = ['UP','DOWN','LEFT','RIGHT']
     for direction in directions:
         tmpTable = [row[:] for row in game.table]
         fakeGame = Game.Game()
         fakeGame.table = tmpTable
-        scores.append(recursive(fakeGame, direction, 0, [None], 0))
-    return directions[scores.index(max(scores))]
+        output.append(recursive(fakeGame, direction, 0, [None], 0))
+
+    scores = [x[0] for x in output]
+    index = scores.index(max(scores))
+    return directions[index], output[index][1]
 
 
 game = Game.Game()
@@ -52,8 +54,8 @@ while run == 0:
     run = game.game_over()
 
     run, direction = controller.event_loop(run)
-    direction = AI()
-    print(direction)
+    direction, free_coord = AI()
+    print(f"direzione = {direction}".ljust(20)+f" | nuovo 2 = {free_coord}".ljust(20))
 
     if not direction == "":
         old_table = [row[:] for row in game.table]
@@ -66,7 +68,8 @@ while run == 0:
                     break
 
         if not abort:
-            game.new_rand()
+        #    game.new_rand()
+            game.table[free_coord[0]][free_coord[1]] = 2
         direction = ""
 
     controller.draw(game.table)
