@@ -50,7 +50,7 @@ class Game:
             arr[0] = 0
         return (arr, score)
 
-    def new_rand(self):
+    def free_coords(self):
         free_coords = []
         y = 0
         while y <= 3:
@@ -60,78 +60,84 @@ class Game:
                     free_coords.append((y, x))
                 x += 1
             y += 1
+        if len(free_coords) == 0:
+            return [None]
+        return free_coords
 
+    def new_rand(self):
+        free_coords = self.free_coords()
         index = free_coords[rn.randint(0, len(free_coords)-1)]
         self.table[index[0]][index[1]] = 4 if rn.randint(0, 9) == 0 else 2
 
-    def move_vertical(self, dir, score):
+    def move_vertical(self, direction, score):
         x = 0
         while x < 4:
-            y = 0 if dir == 1 else 3
-            while (y <= 3 and dir == 1)or(y >= 0 and dir == -1):
+            y = 0 if direction == 1 else 3
+            while (y <= 3 and direction == 1)or(y >= 0 and direction == -1):
                 if not self.table[y][x] == 0:
-                    if y + dir >= 0 and y + dir <= 3 and self.table[y+dir][x] == 0:
-                        self.table[y+dir][x] = self.table[y][x]
+                    if y + direction >= 0 and y + direction <= 3 and self.table[y+direction][x] == 0:
+                        self.table[y+direction][x] = self.table[y][x]
                         self.table[y][x] = 0
-                        y = 0 if dir == 1 else 3
+                        y = 0 if direction == 1 else 3
                         continue
-                y += dir
+                y += direction
             x += 1
 
         x = 0
         while x < 4:
             arr = []
-            y = 0 if dir == 1 else 3
-            while (y <= 3 and dir == 1)or(y >= 0 and dir == -1):
+            y = 0 if direction == 1 else 3
+            while (y <= 3 and direction == 1)or(y >= 0 and direction == -1):
                 arr.append(self.table[y][x])
-                y += dir
+                y += direction
             arr, score = self.collision(arr, score)
             i = 0
-            y = 0 if dir == 1 else 3
-            while (y <= 3 and dir == 1)or(y >= 0 and dir == -1):
+            y = 0 if direction == 1 else 3
+            while (y <= 3 and direction == 1)or(y >= 0 and direction == -1):
                 self.table[y][x] = arr[i]
-                y += dir
+                y += direction
                 i += 1
             x += 1
         return score
 
-    def move_horizontal(self, dir, score):
+    def move_horizontal(self, direction, score):
         y = 0
         while y < 4:
-            x = 0 if dir == 1 else 3
-            while (x <= 3 and dir == 1)or(x >= 0 and dir == -1):
+            x = 0 if direction == 1 else 3
+            while (x <= 3 and direction == 1)or(x >= 0 and direction == -1):
                 if not self.table[y][x] == 0:
-                    if x + dir >= 0 and x + dir <= 3 and self.table[y][x+dir] == 0:
-                        self.table[y][x+dir] = self.table[y][x]
+                    if x + direction >= 0 and x + direction <= 3 and self.table[y][x+direction] == 0:
+                        self.table[y][x+direction] = self.table[y][x]
                         self.table[y][x] = 0
-                        x = 0 if dir == 1 else 3
+                        x = 0 if direction == 1 else 3
                         continue
-                x += dir
+                x += direction
             y += 1
 
         y = 0
         while y < 4:
             arr = []
-            x = 0 if dir == 1 else 3
-            while (x <= 3 and dir == 1)or(x >= 0 and dir == -1):
+            x = 0 if direction == 1 else 3
+            while (x <= 3 and direction == 1)or(x >= 0 and direction == -1):
                 arr.append(self.table[y][x])
-                x += dir
+                x += direction
             arr, score = self.collision(arr, score)
             i = 0
-            x = 0 if dir == 1 else 3
-            while (x <= 3 and dir == 1)or(x >= 0 and dir == -1):
+            x = 0 if direction == 1 else 3
+            while (x <= 3 and direction == 1)or(x >= 0 and direction == -1):
                 self.table[y][x] = arr[i]
-                x += dir
+                x += direction
                 i += 1
             y += 1
         return score
 
-    def move(self, dir, score):
-        if dir == "UP":
+    def move(self, direction, score):
+        if direction == "UP":
             return self.move_vertical(-1, score)
-        elif dir == "DOWN":
+        if direction == "DOWN":
             return self.move_vertical(1, score)
-        elif dir == "RIGHT":
+        if direction == "RIGHT":
             return self.move_horizontal(1, score)
-        elif dir == "LEFT":
+        if direction == "LEFT":
             return self.move_horizontal(-1, score)
+        return score

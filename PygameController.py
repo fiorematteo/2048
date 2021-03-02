@@ -39,25 +39,20 @@ class PygameController:
 
         pg.display.flip()
 
-    def event_loop(self, table, old_table):
-        run = 0
-        abort = False
-        dir = ""
+    def event_loop(self, run):
+        direction = ""
         events = pg.event.get()
         for event in events:
             if event.type == pg.QUIT:
                 run = -1
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_w:
-                    dir = "UP"
+                    direction = "UP"
                 elif event.key == pg.K_s:
-                    dir = "DOWN"
+                    direction = "DOWN"
                 elif event.key == pg.K_d:
-                    dir = "RIGHT"
+                    direction = "RIGHT"
                 elif event.key == pg.K_a:
-                    dir = "LEFT"
-                elif event.key == pg.K_r:
-                    table = [row[:] for row in old_table]
-                    abort = True
+                    direction = "LEFT"
 
-        return run, abort, dir, table, old_table
+        return run, direction
