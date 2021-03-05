@@ -1,10 +1,9 @@
 import Game
 import PygameController
-import pudb
 
 
 def recursive(fakeGame, direction, score, free_coord, depth):
-    if depth < 7:
+    if depth < 3:
         scores = []
         if not free_coord[0] == None:
             fakeGame.table[free_coord[0]][free_coord[1]] = 2
@@ -17,13 +16,11 @@ def recursive(fakeGame, direction, score, free_coord, depth):
                     validMove = True
                     break
         if not validMove and not direction == "":
-            score = -1000
-            depth = 1000
+            score -= 10
+            depth = 100
         for free_coord in fakeGame.free_coords():
             for direction in ['UP','DOWN','LEFT','RIGHT']:
-                tmpTable = [row[:] for row in fakeGame.table]
-                fakeGame = Game.Game()
-                fakeGame.table = tmpTable
+                fakeGame = Game.Game(fakeGame.table)
                 scores.append(recursive(fakeGame, direction, score, free_coord, depth+1)[0])
             return max(scores), free_coord
     return score, free_coord
@@ -32,9 +29,7 @@ def AI():
     output = []
     directions = ['UP','DOWN','LEFT','RIGHT']
     for direction in directions:
-        tmpTable = [row[:] for row in game.table]
-        fakeGame = Game.Game()
-        fakeGame.table = tmpTable
+        fakeGame = Game.Game(game.table)
         output.append(recursive(fakeGame, direction, 0, [None], 0))
 
     scores = [x[0] for x in output]
@@ -46,6 +41,7 @@ game = Game.Game()
 controller = PygameController.PygameController()
 run = 0
 score = 0
+lastMoves = []
 
 game.new_rand()
 game.new_rand()
@@ -56,6 +52,12 @@ while run == 0:
     run, direction = controller.event_loop(run)
     direction, free_coord = AI()
     print(f"direzione = {direction}".ljust(20)+f" | nuovo 2 = {free_coord}".ljust(20))
+
+    lastMoves.append(direction)
+    if len(lastMoves) > 50:
+        lastMoves.pop(0)
+        if all(move == lastMoves[0] for move in lastMoves):
+            run = -1
 
     if not direction == "":
         old_table = [row[:] for row in game.table]
@@ -75,3 +77,4 @@ while run == 0:
     controller.draw(game.table)
 
 print("GAME OVER" if run == -1 else "YOU WIN GAMER")
+input()

@@ -3,12 +3,15 @@ import random as rn
 
 class Game:
 
-    def __init__(self):
-        self.table = []
-        for y in range(4):
-            self.table.append([])
-            for x in range(4):
-                self.table[y].append(0)
+    def __init__(self, table = None):
+        if table == None:
+            self.table = []
+            for y in range(4):
+                self.table.append([])
+                for x in range(4):
+                    self.table[y].append(0)
+        else:
+            self.table = [row[:] for row in table]
 
     def game_over(self):
         for y in range(4):
@@ -27,7 +30,7 @@ class Game:
                     return 0
                 if x + 1 <= 3 and self.table[y][x] == self.table[y][x+1]:
                     return 0
-                if x - 1 >= 0 and self.table[y][x] == self.table[y-1][x]:
+                if y - 1 >= 0 and self.table[y][x] == self.table[y-1][x]:
                     return 0
                 if x - 1 >= 0 and self.table[y][x] == self.table[y][x-1]:
                     return 0
