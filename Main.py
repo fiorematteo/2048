@@ -3,7 +3,7 @@ import PygameController
 
 
 def recursive(fakeGame, direction, score, free_coord, depth):
-    if depth < 3:
+    if depth < 4:
         scores = []
         if not free_coord[0] == None:
             fakeGame.table[free_coord[0]][free_coord[1]] = 2
@@ -37,44 +37,50 @@ def AI():
     return directions[index], output[index][1]
 
 
-game = Game.Game()
-controller = PygameController.PygameController()
-run = 0
-score = 0
-lastMoves = []
+game = None
+def main():
+    global game;
+    game = Game.Game()
+    controller = PygameController.PygameController()
+    run = 0
+    score = 0
+    lastMoves = []
+    
+    game.new_rand()
+    game.new_rand()
+    
+    while run == 0:
+        run = game.game_over()
+    
+        run, direction = controller.event_loop(run)
+        direction, free_coord = AI()
+    
+        lastMoves.append(direction)
+        if len(lastMoves) > 50:
+            lastMoves.pop(0)
+            if all(move == lastMoves[0] for move in lastMoves):
+                run = -1
+    
+        if not direction == "":
+            old_table = [row[:] for row in game.table]
+            score = game.move(direction, score)
+            abort = True
+            for y in range(4):
+                for x in range(4):
+                    if not game.table[y][x] == old_table[y][x]:
+                        abort = False
+                        break
+    
+            if not abort:
+            #    game.new_rand()
+                game.table[free_coord[0]][free_coord[1]] = 2
+            direction = ""
+    
+        controller.draw(game.table)
+    
+    print(f"score: {score}")
+    print("GAME OVER" if run == -1 else "YOU WIN GAMER")
 
-game.new_rand()
-game.new_rand()
-
-while run == 0:
-    run = game.game_over()
-
-    run, direction = controller.event_loop(run)
-    direction, free_coord = AI()
-    print(f"direzione = {direction}".ljust(20)+f" | nuovo 2 = {free_coord}".ljust(20))
-
-    lastMoves.append(direction)
-    if len(lastMoves) > 50:
-        lastMoves.pop(0)
-        if all(move == lastMoves[0] for move in lastMoves):
-            run = -1
-
-    if not direction == "":
-        old_table = [row[:] for row in game.table]
-        score = game.move(direction, score)
-        abort = True
-        for y in range(4):
-            for x in range(4):
-                if not game.table[y][x] == old_table[y][x]:
-                    abort = False
-                    break
-
-        if not abort:
-        #    game.new_rand()
-            game.table[free_coord[0]][free_coord[1]] = 2
-        direction = ""
-
-    controller.draw(game.table)
-
-print("GAME OVER" if run == -1 else "YOU WIN GAMER")
-input()
+if __name__ == "__main__":
+    main()
+    input()
