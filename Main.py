@@ -3,7 +3,7 @@ import PygameController
 
 
 def recursive(fakeGame, direction, score, free_coord, depth):
-    if depth < 4:
+    if depth < 6:
         scores = []
         if not free_coord[0] == None:
             fakeGame.table[free_coord[0]][free_coord[1]] = 2
